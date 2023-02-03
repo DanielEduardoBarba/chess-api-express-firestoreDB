@@ -1,0 +1,1 @@
+A chess game (to be deployed) that works on a GCP server and uses a firebase database utilizing VanillaJS
