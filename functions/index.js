@@ -9,8 +9,9 @@ app.use(express.json())
 
 app.get("/getboard", async (req,res)=>{
     getBoard()
-    .then((currentBoard)=>{
-        res.send(currentBoard)
+    .then((g)=>{
+        console.log(g)
+        res.send(g)
     })
     .catch(console.error)
 

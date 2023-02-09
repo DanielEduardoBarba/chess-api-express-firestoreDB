@@ -11,10 +11,22 @@ initializeApp({
 
 const db=getFirestore()
 
-const gameBoard=db.collection("chess")
+const gameType=db.collection("chess")
+const session="game2"
+
+const gameBoardID = 2
 
 
-
+const RESETold={
+    boardID: 2,
+    whitePos: ["01","11","21","31","41","51","61","71","00","10","20","30","40","50","60","70"],
+    blackPos: ["06","16","26","36","46","56","66","76","07","17","27","37","47","57","67","77"]
+ }
+ const RESET={
+    boardID: 3,
+    whitePos: ["01","11","21","31","41","51","61","71","00","10","20","30","40","50","60","70"],
+    blackPos: ["06","16","26","36","46","56","66","76","07","17","27","37","47","57","67","77"]
+ }
 
 let boardY=[]
 let boardX=[]
@@ -25,7 +37,8 @@ const bPieces ="♙♙♙♙♙♙♙♙♖♘♗♕♔♗♘♖"
 
 
 
-const currentState={
+let currentState={
+    gameBoardID: 0,
     whitePos:[],
     blackPos: []
  }
@@ -33,18 +46,15 @@ const currentState={
 
 
  export const resetBoard = ()=>{
-    const RESET={
-        whitePos: ["01","11","21","31","41","51","61","71","00","10","20","30","40","50","60","70"],
-        blackPos: ["06","16","26","36","46","56","66","76","07","17","27","37","47","57","67","77"]
-     }
-    gameBoard.doc("game").set(RESET)
+  
+    gameType.doc(session).set(RESET)
     .then((doc)=>{
         console.log("Board Set")
     }).catch(console.error)
 }
 
-export const setBoard = ()=>{
-    gameBoard.doc("game").set(currentState)
+export const setBoard = (g)=>{
+    gameType.doc(session).set(g)
     .then((doc)=>{
         console.log("Move made")
     }).catch(console.error)
@@ -52,17 +62,23 @@ export const setBoard = ()=>{
 
 export const getBoard = async ()=>{
 
+        //console.log("HERE")
         let recieved={}
-        const raw = await gameBoard.get()
-        const incoming = raw.docs.map(doc=>doc.data())
-
-        recieved=incoming[0]
-
-        currentState.whitePos=[...recieved.whitePos]
-        currentState.blackPos=[...recieved.blackPos]
-
+        const raw = await gameType.get()
+        const incoming = raw.docs.map(doc=>{
+           const {boardID}=doc.data()
+          
+           if(boardID===gameBoardID) {
+                console.log("BID: ", boardID," GBID: ", gameBoardID)
+                recieved = doc.data()
+                //return doc.data() //returns everything as it maps that matched
+           }
+        })
         
-        return currentState
+        
+        return {...recieved}
+        
+      
     
 }
 
@@ -94,7 +110,6 @@ export const layoutBoard = () => {
    // document.getElementById("board").innerHTML = render
 }
 
-
 export const displayBoard = () =>{
     for(let j=0; j<8;j++){
         for(let i=0; i<8;i++){
@@ -120,23 +135,22 @@ export const displayBoard = () =>{
 
 export const  updateBoard = (posA, posB) => {
 
-    console.log("HEY")
-    getBoard()
+    let g = getBoard()
     .then(()=>{
-        if(currentState.whitePos.includes(posA) || currentState.blackPos.includes(posA)){
+        if(g.whitePos.includes(posA) || g.blackPos.includes(posA)){
             
-            if(currentState.whitePos.includes(posA) ){
-                currentState.whitePos[currentState.whitePos.indexOf(posA)]=posB
-                if(currentState.blackPos.includes(posB) ) currentState.blackPos[currentState.blackPos.indexOf(posB)]=" "
+            if(g.whitePos.includes(posA) ){
+                g.whitePos[g.whitePos.indexOf(posA)]=posB
+                if(g.blackPos.includes(posB) ) g.blackPos[g.blackPos.indexOf(posB)]=" "
             }
-            if(currentState.blackPos.includes(posA) ){
-                    currentState.blackPos[currentState.blackPos.indexOf(posA)]=posB
-                    if(currentState.whitePos.includes(posB) ) currentState.whitePos[currentState.whitePos.indexOf(posB)]=" "
+            if(g.blackPos.includes(posA) ){
+                    g.blackPos[g.blackPos.indexOf(posA)]=posB
+                    if(g.whitePos.includes(posB) ) g.whitePos[g.whitePos.indexOf(posB)]=" "
                 }
          }
     
-        setBoard()
-        //console.log(currentState)
+        setBoard(g)
+        //console.log(g)
         //return
 
     })
@@ -144,7 +158,7 @@ export const  updateBoard = (posA, posB) => {
 
     }
 
-     
+    
   
 //getBoard()
 export const askUser = ()=>{
@@ -157,14 +171,6 @@ export const askUser = ()=>{
     setBoard()
     displayBoard()
 }
-
-
-
-
-
-
-
-
 
 
 
