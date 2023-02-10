@@ -1,1 +1,1 @@
-A chess game (to be deployed) that works on a GCP server and uses a firebase database utilizing VanillaJS
+A chess api server that works on a GCP cloud functions and uses a firebase database to communicate with a front end React app found [HERE](https://github.com/DanielEduardoBarba/chess-client-react-jsx)
