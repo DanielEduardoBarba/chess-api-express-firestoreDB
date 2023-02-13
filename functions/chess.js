@@ -18,10 +18,7 @@ const gameType=db.collection("chess")
 //add hidden react security key later
 //const gameBoardID = 10
 
-
-
- const RESET={
-    boardID: 10,
+ let RESET={
     whitePos: ["01","11","21","31","41","51","61","71","00","10","20","30","40","50","60","70"],
     blackPos: ["06","16","26","36","46","56","66","76","07","17","27","37","47","57","67","77"]
  }
@@ -44,18 +41,31 @@ let currentState={
 
 
  export const resetBoard = (gameBoardID)=>{
-  
-    gameType.doc(gameBoardID).set(RESET)
+    RESET.boardID=gameBoardID
+    gameType.doc(String(gameBoardID)).set(RESET)
     .then((doc)=>{
-        console.log("Board Set")
+      console.log(`Session ${gameBoardID} create`)
     }).catch(console.error)
 }
+export const createBoard = async (gameBoardID)=>{
+    RESET.boardID=gameBoardID
+    try{
+        await gameType.doc(String(gameBoardID)).set(RESET)
+        return `Session ${gameBoardID} create`
+    }
+    catch{
+    }
+}
 
-export const setBoard = (g)=>{
-    gameType.doc(session).set(g)
+export const setBoard = (gameBoardID,g)=>{
+    //    console.log("-----------------IM HERE!!!!! SETBOARD-------------------------") 
+    //    console.log(typeof gameBoardID)
+    //    console.log(String(gameBoardID))
+    gameType.doc(String(gameBoardID)).set(g)
     .then((doc)=>{
-        console.log("Move made")
-    }).catch(console.error)
+       // console.log("Move made")
+       return "Move made!"
+    }).catch(e => e)
 }
 
 export const getLobby = async ()=>{
@@ -68,11 +78,8 @@ export const getLobby = async ()=>{
         })
         
       
-        console.log(incoming)
+        //console.log(incoming)
         return [...incoming]
-        
-      
-    
 }
 export const getBoard = async (gameBoardID)=>{
 
@@ -81,12 +88,13 @@ export const getBoard = async (gameBoardID)=>{
         const raw = await gameType.get()
         const  incoming= raw.docs.map(doc=>{
            const {boardID}=doc.data()
-          // console.log("BID: ", boardID," GBID: ", gameBoardID)
+          
            if(boardID==gameBoardID) recieved = doc.data()      
         })
         
         
-        console.log(recieved)
+        // console.log(recieved)
+        // console.log(typeof recieved)
         return {...recieved}
         
       
@@ -146,8 +154,10 @@ export const displayBoard = () =>{
 
 export const updateBoard = (gameID,posA, posB) => {
 
+    //console.log("INSIDE UPDATE BOARD: ", gameID)
       getBoard(gameID)
     .then((g)=>{
+        console.log("GOT THIS BOARD: ", g)
         if(g.whitePos.includes(posA) || g.blackPos.includes(posA)){
             
             if(g.whitePos.includes(posA) ){
@@ -160,8 +170,9 @@ export const updateBoard = (gameID,posA, posB) => {
                 }
          }
     
-        setBoard(g)
-        //console.log(g)
+        // console.log("CHANGED TO THIS BAORD: ",g)
+        setBoard(gameID,g)
+        .then()
         //return
 
     })
@@ -175,13 +186,20 @@ export const updateBoard = (gameID,posA, posB) => {
 export const askUser = ()=>{
 
     displayBoard()
-    //  let from = prompt("Select piece:")
-    //  let to = prompt("Select destination:")
-     //console.log(currentState)
+    //let from = prompt("Select piece:")
+    //let to = prompt("Select destination:")
+    //console.log(currentState)
     updateBoard(from, to)
     setBoard()
     displayBoard()
 }
 
+
+//set game boards
+// for(let i =1 ;i=<10;i++){
+//   const res= await createBoard(i)
+//   console.log(res)
+// }
+//createBoard(2);
 
 
