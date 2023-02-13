@@ -12,18 +12,16 @@ initializeApp({
 const db=getFirestore()
 
 const gameType=db.collection("chess")
-const session="game2"
+//const session="game10"
 
-const gameBoardID = 2
+//should come from http request param
+//add hidden react security key later
+//const gameBoardID = 10
 
 
-const RESETold={
-    boardID: 2,
-    whitePos: ["01","11","21","31","41","51","61","71","00","10","20","30","40","50","60","70"],
-    blackPos: ["06","16","26","36","46","56","66","76","07","17","27","37","47","57","67","77"]
- }
+
  const RESET={
-    boardID: 3,
+    boardID: 10,
     whitePos: ["01","11","21","31","41","51","61","71","00","10","20","30","40","50","60","70"],
     blackPos: ["06","16","26","36","46","56","66","76","07","17","27","37","47","57","67","77"]
  }
@@ -45,9 +43,9 @@ let currentState={
 
 
 
- export const resetBoard = ()=>{
+ export const resetBoard = (gameBoardID)=>{
   
-    gameType.doc(session).set(RESET)
+    gameType.doc(gameBoardID).set(RESET)
     .then((doc)=>{
         console.log("Board Set")
     }).catch(console.error)
@@ -60,22 +58,35 @@ export const setBoard = (g)=>{
     }).catch(console.error)
 }
 
-export const getBoard = async ()=>{
+export const getLobby = async ()=>{
 
         //console.log("HERE")
-        let recieved={}
+        let incoming = []
         const raw = await gameType.get()
-        const incoming = raw.docs.map(doc=>{
+        raw.docs.map(doc=> {
+           incoming.push(doc.data())
+        })
+        
+      
+        console.log(incoming)
+        return [...incoming]
+        
+      
+    
+}
+export const getBoard = async (gameBoardID)=>{
+
+        //console.log("HERE")
+        let recieved = {}
+        const raw = await gameType.get()
+        const  incoming= raw.docs.map(doc=>{
            const {boardID}=doc.data()
-          
-           if(boardID===gameBoardID) {
-                console.log("BID: ", boardID," GBID: ", gameBoardID)
-                recieved = doc.data()
-                //return doc.data() //returns everything as it maps that matched
-           }
+          // console.log("BID: ", boardID," GBID: ", gameBoardID)
+           if(boardID==gameBoardID) recieved = doc.data()      
         })
         
         
+        console.log(recieved)
         return {...recieved}
         
       
@@ -133,10 +144,10 @@ export const displayBoard = () =>{
 }
 
 
-export const  updateBoard = (posA, posB) => {
+export const updateBoard = (gameID,posA, posB) => {
 
-    let g = getBoard()
-    .then(()=>{
+      getBoard(gameID)
+    .then((g)=>{
         if(g.whitePos.includes(posA) || g.blackPos.includes(posA)){
             
             if(g.whitePos.includes(posA) ){
