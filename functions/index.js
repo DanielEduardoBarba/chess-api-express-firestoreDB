@@ -10,7 +10,7 @@ app.use(express.json())
 app.get("/getlobby", async (req,res)=>{
     getLobby()
     .then((lobbies)=>{
-       //console.log({lobbies})
+       console.log({lobbies})
         res.status(201).send({lobbies})
     })
     .catch(console.error)
@@ -38,17 +38,22 @@ app.post("/move/:gameID", (req, res)=>{
         const {from,to} = req.body
         //console.log(from ,"---RECIEVED---", to,"GAME---",req.params.gameID)
         updateBoard(req.params.gameID,from, to)
-        res.status(201).send({message:"Move Made!"})
+        .then((g)=>{
+            // console.log(g)
+            //g body is deconstructed during back end functions, this returns an obj
+             res.status(201).send({g})
+         })
+         .catch(console.error)
     }
 })
 app.post("/activity/:gameID", (req, res)=>{
-    console.log('-------------- POST MADE ---------------')
+   // console.log('-------------- POST MADE ---------------')
     if(req.params.gameID!=0){
 
         const {messages} = req.body
-        //console.log(from ,"---RECIEVED---", to,"GAME---",req.params.gameID)
+       // console.log("---RECIEVED---",messages,"GAME---",req.params.gameID)
         updateActivity(req.params.gameID, messages)
-        res.status(201).send({message:"Move Made!"})
+        res.status(201).send({message:"Chat Sent!"})
     }
 })
 

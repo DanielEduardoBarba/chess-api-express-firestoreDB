@@ -63,21 +63,24 @@ export const createBoard = async (gameBoardID)=>{
     }
 }
 
-export const setBoard = (gameBoardID,g)=>{
+export const setBoard = async (gameBoardID,g)=>{
     //    console.log("-----------------IM HERE!!!!! SETBOARD-------------------------") 
     //    console.log(typeof gameBoardID)
     //    console.log(String(gameBoardID))
-    gameType.doc(String(gameBoardID)).set(g)
-    .then((doc)=>{
+    try{
+        const doc = await gameType.doc(String(gameBoardID)).set(g)
+        return g
+    }catch{
+        console.error("Setting Board did not work!")
+
+    }
        // console.log("Move made")
-       return "Move made!"
-    }).catch(console.error)
 }
 export const updateActivity = (gameBoardID,m)=>{
     //    console.log("-----------------IM HERE!!!!! SETBOARD-------------------------") 
     //    console.log(typeof gameBoardID)
     //    console.log(String(gameBoardID))
-    gameType.doc(String(gameBoardID)).set(m)
+    gameType.doc(String(gameBoardID)).update({messages: m})
     .then((doc)=>{
        // console.log("Move made")
        return "Activity updated!"
@@ -170,12 +173,12 @@ export const displayBoard = () =>{
 }
 
 
-export const updateBoard = (gameID,posA, posB) => {
+export const updateBoard = async (gameID,posA, posB) => {
 
     //console.log("INSIDE UPDATE BOARD: ", gameID)
       getBoard(gameID)
     .then((g)=>{
-        console.log("GOT THIS BOARD: ", g)
+        //console.log("GOT THIS BOARD: ", g)
         if(g.whitePos.includes(posA) || g.blackPos.includes(posA)){
             
             if(g.whitePos.includes(posA) ){
@@ -189,9 +192,8 @@ export const updateBoard = (gameID,posA, posB) => {
          }
     
         // console.log("CHANGED TO THIS BAORD: ",g)
-        setBoard(gameID,g)
-        .then()
-        //return
+        return setBoard(gameID,g)
+        
 
     })
     .catch(console.error)
@@ -214,7 +216,7 @@ export const askUser = ()=>{
 
 
 //set game boards
-// for(let i =1 ;i<=5;i++){
+// for(let i =0 ;i<=5;i++){
 //   const res= await createBoard(i)
 //   console.log(res)
 // }
