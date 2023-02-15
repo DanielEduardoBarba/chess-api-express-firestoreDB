@@ -19,12 +19,17 @@ const gameType=db.collection("chess")
 //const gameBoardID = 10
 
  let RESET={
+    //only game board ID is needed when resetting
     whitePos: ["01","11","21","31","41","51","61","71","00","10","20","30","40","50","60","70"],
-    blackPos: ["06","16","26","36","46","56","66","76","07","17","27","37","47","57","67","77"]
+    blackPos: ["06","16","26","36","46","56","66","76","07","17","27","37","47","57","67","77"],
+    messages: [],
+    player1: "",
+    player2: "",
+    turn: 0
+
  }
 
-let boardY=[]
-let boardX=[]
+
 
 //from database
 const wPieces ="♟♟♟♟♟♟♟♟♜♞♝♛♚♝♞♜"
@@ -44,14 +49,15 @@ let currentState={
     RESET.boardID=gameBoardID
     gameType.doc(String(gameBoardID)).set(RESET)
     .then((doc)=>{
-      console.log(`Session ${gameBoardID} create`)
+      console.log(`Session ${gameBoardID} reset/created`)
     }).catch(console.error)
 }
+
 export const createBoard = async (gameBoardID)=>{
     RESET.boardID=gameBoardID
     try{
         await gameType.doc(String(gameBoardID)).set(RESET)
-        return `Session ${gameBoardID} create`
+        return `Session ${gameBoardID} created`
     }
     catch{
     }
@@ -65,7 +71,17 @@ export const setBoard = (gameBoardID,g)=>{
     .then((doc)=>{
        // console.log("Move made")
        return "Move made!"
-    }).catch(e => e)
+    }).catch(console.error)
+}
+export const updateActivity = (gameBoardID,m)=>{
+    //    console.log("-----------------IM HERE!!!!! SETBOARD-------------------------") 
+    //    console.log(typeof gameBoardID)
+    //    console.log(String(gameBoardID))
+    gameType.doc(String(gameBoardID)).set(m)
+    .then((doc)=>{
+       // console.log("Move made")
+       return "Activity updated!"
+    }).catch(console.error)
 }
 
 export const getLobby = async ()=>{
@@ -130,6 +146,8 @@ export const layoutBoard = () => {
 }
 
 export const displayBoard = () =>{
+    let boardXY=[]
+    let boardX=[]
     for(let j=0; j<8;j++){
         for(let i=0; i<8;i++){
 
@@ -144,9 +162,9 @@ export const displayBoard = () =>{
              }
     
         }
-        boardY[j]=[...boardX]
+        boardXY[j]=[...boardX]
     }
-    const grid=[...boardY]
+    const grid=[...boardXY]
     
     console.table(grid)
 }
@@ -196,7 +214,7 @@ export const askUser = ()=>{
 
 
 //set game boards
-// for(let i =1 ;i=<10;i++){
+// for(let i =1 ;i<=5;i++){
 //   const res= await createBoard(i)
 //   console.log(res)
 // }

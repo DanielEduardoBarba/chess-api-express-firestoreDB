@@ -1,5 +1,5 @@
 import express from "express"
-import {getBoard, getLobby, resetBoard, updateBoard} from "./chess.js"
+import {getBoard, getLobby, resetBoard, updateActivity, updateBoard} from "./chess.js"
 import cors from "cors"
 import functions from "firebase-functions"
 
@@ -38,6 +38,16 @@ app.post("/move/:gameID", (req, res)=>{
         const {from,to} = req.body
         //console.log(from ,"---RECIEVED---", to,"GAME---",req.params.gameID)
         updateBoard(req.params.gameID,from, to)
+        res.status(201).send({message:"Move Made!"})
+    }
+})
+app.post("/activity/:gameID", (req, res)=>{
+    console.log('-------------- POST MADE ---------------')
+    if(req.params.gameID!=0){
+
+        const {messages} = req.body
+        //console.log(from ,"---RECIEVED---", to,"GAME---",req.params.gameID)
+        updateActivity(req.params.gameID, messages)
         res.status(201).send({message:"Move Made!"})
     }
 })
