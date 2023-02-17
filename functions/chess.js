@@ -45,7 +45,7 @@ let currentState={
  }
 
 
- const lobbySize = 5
+
  
  
  
@@ -270,7 +270,7 @@ export const updateBoard = async (gameBoardID,posA, posB, req, res) => {
     }
     
     
-    const scriptMakeBoards = async () =>{
+    const scriptMakeBoards = async (lobbySize) =>{
         //set game boards
         for(let i =1 ;i<=lobbySize;i++){
             const res= await createBoard(i)
@@ -282,6 +282,6 @@ export const updateBoard = async (gameBoardID,posA, posB, req, res) => {
         
     }
     
-    //scriptMakeBoards()
+    //scriptMakeBoards(5)
     
     
