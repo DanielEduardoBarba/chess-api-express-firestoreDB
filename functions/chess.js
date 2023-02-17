@@ -28,7 +28,6 @@ const gameType=db.collection("chess")
     mutualCmds:[],
     _lastMove: 0,
     turn: 1
-
  }
 
 
@@ -45,19 +44,36 @@ let currentState={
     blackPos: []
  }
 
- const gameTimeout = 60
+
  const lobbySize = 5
  
  
  
- 
- 
- 
- export const gameWarden = async (gameBoardID) =>{
-     
+ export const gameWarden = async (gameBoardID, gameTimeout) =>{
+    //  resetBoard(gameBoardID)
+    //  return
      const board = await getBoard(gameBoardID)
-     if((Timestamp.now().seconds - board._lastMove)>gameTimeout){
-         resetBoard(gameBoardID)
+     let toRESET = {...RESET}
+     toRESET.players=board.players
+     toRESET._lastMove=board._lastMove
+     if((Timestamp.now().seconds - board._lastMove)>gameTimeout && board._lastMove>0){
+
+         if(board.players[1]!="" || board.players[1].includes("*")){
+            console.log('p1 out')
+            if(board.players[1].includes("***"))toRESET.players[1]=""
+            else toRESET.players[1]+="*"
+         }
+         if(board.players[2]!="" || board.players[2].includes("*")){
+            console.log('p2 out')
+            if(board.players[2].includes("***"))toRESET.players[2]=""
+            else toRESET.players[2]+="*"
+         }
+         
+         toRESET.boardID=gameBoardID
+        gameType.doc(String(gameBoardID)).set(toRESET)
+        .then((doc)=>{
+            console.log(`Session ${gameBoardID} reset/created`)
+           }).catch(console.error)
         }
         // .then(g=>{
             
